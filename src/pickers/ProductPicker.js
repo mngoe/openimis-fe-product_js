@@ -1,91 +1,54 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { injectIntl } from "react-intl";
-import { formatMessage, AutoSuggestion, withModulesManager } from "@openimis/fe-core";
-import { fetchProducts } from "../actions";
+import React, { useEffect, useState } from "react";
+import { Autocomplete, useModulesManager, useTranslations } from "@openimis/fe-core";
+import { useProductsQuery } from "../hooks";
 import _debounce from "lodash/debounce";
 
-class ProductPicker extends Component {
-  constructor(props) {
-    super(props);
-    this.cache = props.modulesManager.getConf("fe-product", "cacheProducts", true);
-    this.selectThreshold = props.modulesManager.getConf("fe-product", "ProductPicker.selectThreshold", 10);
-  }
+const ProductPicker = (props) => {
+  const {
+    multiple,
+    required,
+    placeholder,
+    label,
+    withLabel,
+    withPlaceholder,
+    readOnly,
+    value,
+    onChange,
+    filter,
+    filterSelectedOptions,
+    locationId,
+  } = props;
 
-  componentDidMount() {
-    if (this.cache && !this.props.products) {
-      // prevent loading multiple times the cache when component is
-      // several times on tha page
-      setTimeout(() => {
-        !this.props.fetching && this.props.fetchProducts(this.props.modulesManager);
-      }, Math.floor(Math.random() * 300));
-    }
-  }
+  const modulesManager = useModulesManager();
+  const [filters, setFilters] = useState({ location: locationId });
+  const { formatMessage } = useTranslations("product", modulesManager);
+  const { isLoading, error, data } = useProductsQuery({ filters }, { skip: true });
 
-  formatSuggestion = (s) => (!!s ? `${s.code} ${s.name}` : "");
+  const onOpen = () => {
+    setFilters({ first: 15, location: locationId });
+  };
 
-  getSuggestions = (str) =>
-    !!str &&
-    str.length >= this.props.modulesManager.getConf("fe-product", "productsMinCharLookup", 2) &&
-    this.props.fetchProducts(this.props.modulesManager, str);
-
-  debouncedGetSuggestion = _debounce(
-    this.getSuggestions,
-    this.props.modulesManager.getConf("fe-product", "debounceTime", 800),
+  return (
+    <Autocomplete
+      multiple={multiple}
+      required={required}
+      error={error}
+      placeholder={placeholder ?? formatMessage("ProductPicker.placeholder")}
+      label={label ?? formatMessage("Product")}
+      withLabel={withLabel}
+      withPlaceholder={withPlaceholder}
+      readOnly={readOnly}
+      options={data.products ?? []}
+      isLoading={isLoading}
+      value={value}
+      getOptionLabel={(option) => `${option.code} ${option.name}`}
+      onChange={(value) => onChange(value, value ? `${value.code} ${value.name}` : null)}
+      onOpen={onOpen}
+      filterOptions={filter}
+      filterSelectedOptions={filterSelectedOptions}
+      onInputChange={(search) => setFilters({ first: 15, search, location: locationId })}
+    />
   );
-
-  onSuggestionSelected = (v) => this.props.onChange(v, this.formatSuggestion(v));
-
-  render() {
-    const {
-      intl,
-      products,
-      withLabel = true,
-      label,
-      withPlaceholder = false,
-      placeholder,
-      value,
-      reset,
-      readOnly = false,
-      required = false,
-      withNull = false,
-      nullLabel = null,
-      filter = null,
-    } = this.props;
-    let items = products;
-    if (!!filter) {
-      items = this.props.filter(items);
-    }
-    return (
-      <AutoSuggestion
-        items={items}
-        label={!!withLabel && (label || formatMessage(intl, "product", "Product"))}
-        placeholder={
-          !!withPlaceholder ? placeholder || formatMessage(intl, "product", "ProductPicker.placehoder") : null
-        }
-        getSuggestions={this.cache ? null : this.debouncedGetSuggestion}
-        getSuggestionValue={this.formatSuggestion}
-        onSuggestionSelected={this.onSuggestionSelected}
-        value={value}
-        reset={reset}
-        readOnly={readOnly}
-        required={required}
-        selectThreshold={this.selectThreshold}
-        withNull={withNull}
-        nullLabel={nullLabel || formatMessage(intl, "product", "product.ProductPicker.null")}
-      />
-    );
-  }
-}
-
-const mapStateToProps = (state) => ({
-  products: state.product.products,
-  fetching: state.product.fetchingProducts,
-});
-
-const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ fetchProducts }, dispatch);
 };
 
-export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(withModulesManager(ProductPicker)));
+export default ProductPicker;

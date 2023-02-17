@@ -1,6 +1,6 @@
 {
   "name": "@openimis/fe-product",
-  "version": "1.3.0",
+  "version": "1.4.0-rc2",
   "description": "openIMIS Frontend Product reference module",
   "license": "AGPL-3.0-only",
   "repository": "openimis/openimis-fe-product_js",
@@ -43,5 +43,7 @@
   "files": [
     "dist"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "@mui/x-data-grid": "^4.0.0"
+  }
 }
