@@ -115,6 +115,16 @@ const MainPanelForm = (props) => {
           onChange={(recurrence) => onEditedChanged({ ...edited, recurrence })}
         />
       </Grid>
+      <Grid item xs={3} className={classes.item}>
+        <PublishedComponent
+          pubRef="program.ProgramPicker"
+          value={edited?.program ? edited.program: null}
+          withNull={true}
+          readOnly={readOnly}
+          onChange={(program) => onEditedChanged({ ...edited, program })}
+          required={true}
+        />
+      </Grid>
       <Grid item xs={12}>
         <SectionTitle label={formatMessage("validitySectionTitle")} />
       </Grid>
