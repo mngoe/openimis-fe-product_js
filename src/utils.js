@@ -1,4 +1,4 @@
-import { graphqlWithVariables, toISODate } from "@openimis/fe-core";
+import { graphqlWithVariables, toISODate, decodeId } from "@openimis/fe-core";
 import _ from "lodash";
 
 export const validateProductForm = (values) => {
@@ -17,6 +17,7 @@ export const validateProductForm = (values) => {
     "dateFrom",
     "dateTo",
     "ceilingInterpretation",
+    "program"
   ];
   const errors = {};
 
@@ -66,6 +67,7 @@ export const toInputValues = (values) => {
     id,
     code,
     location,
+    program,
     conversionProduct,
     validityTo,
     validityFrom,
@@ -94,6 +96,7 @@ export const toInputValues = (values) => {
     code: uuid ? undefined : code,
     dateFrom: toISODate(values.dateFrom),
     dateTo: toISODate(values.dateTo),
+    program: decodeId(program.id),
     locationUuid: location?.uuid,
     conversionProductUuid: conversionProduct?.uuid,
   };
