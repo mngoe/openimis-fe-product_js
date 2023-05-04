@@ -66,7 +66,7 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     maxMembers
     threshold
     location {id uuid code name parent {id uuid name code}}
-    program {id idProgram nameProgram validityDate}
+    program {id idProgram nameProgram validityDateFrom}
     
     validityFrom
     validityTo
