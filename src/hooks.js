@@ -14,6 +14,7 @@ export const GRAPHQL_USE_PRODUCTS_PRODUCT_FRAGMENT = `
     maxMembers
     validityFrom
     validityTo
+    program {id idProgram nameProgram validityDateFrom}
   } 
 `;
 
