@@ -125,6 +125,26 @@ const MainPanelForm = (props) => {
           required={true}
         />
       </Grid>
+      <Grid item xs={3} className={classes.item}>
+        <NumberInput
+          min={0}
+          module="product"
+          label="ageMineur"
+          readOnly={readOnly}
+          value={edited?.ageMineur ?? ""}
+          onChange={(ageMineur) => onEditedChanged({ ...edited, ageMineur  })}
+        />
+      </Grid>
+      <Grid item xs={3} className={classes.item}>
+        <NumberInput
+          min={0}
+          module="product"
+          label="ageEnfant"
+          readOnly={readOnly}
+          value={edited?.ageEnfant ?? ""}
+          onChange={(ageEnfant) => onEditedChanged({ ...edited, ageEnfant })}
+        />
+      </Grid>
       <Grid item xs={12}>
         <SectionTitle label={formatMessage("validitySectionTitle")} />
       </Grid>
@@ -180,6 +200,7 @@ const MainPanelForm = (props) => {
           onChange={(accCodePremiums) => onEditedChanged({ ...edited, accCodePremiums })}
         />
       </Grid>
+
     </Grid>
   );
 };
