@@ -1,4 +1,4 @@
 {
-  "product.ageMineur": "Age Mineur",
-  "product.ageEnfant": "Age Enfant"
+  "product.ageMinimal": "Age Minimal",
+  "product.ageMaximal": "Age Maximal"
 }

@@ -129,20 +129,20 @@ const MainPanelForm = (props) => {
         <NumberInput
           min={0}
           module="product"
-          label="ageMineur"
+          label="ageMinimal"
           readOnly={readOnly}
-          value={edited?.ageMineur ?? ""}
-          onChange={(ageMineur) => onEditedChanged({ ...edited, ageMineur  })}
+          value={edited?.ageMinimal?? ""}
+          onChange={(ageMinimal) => onEditedChanged({ ...edited, ageMinimal  })}
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
         <NumberInput
           min={0}
           module="product"
-          label="ageEnfant"
+          label="ageMaximal"
           readOnly={readOnly}
-          value={edited?.ageEnfant ?? ""}
-          onChange={(ageEnfant) => onEditedChanged({ ...edited, ageEnfant })}
+          value={edited?.ageMaximal ?? ""}
+          onChange={(ageMaximal) => onEditedChanged({ ...edited, ageMaximal })}
         />
       </Grid>
       <Grid item xs={12}>
