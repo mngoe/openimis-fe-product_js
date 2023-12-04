@@ -10,12 +10,12 @@ export const GRAPHQL_USE_PRODUCTS_PRODUCT_FRAGMENT = `
     code
     location {id name uuid code parent {id name uuid code}}
     dateFrom
-    dateTo 
+    dateTo
     maxMembers
     validityFrom
     validityTo
-    program {id idProgram nameProgram validityDateFrom}
-  } 
+    program {id code idProgram nameProgram validityDateFrom}
+  }
 `;
 
 export const useProductsQuery = ({ filters }, config) => {
@@ -23,7 +23,7 @@ export const useProductsQuery = ({ filters }, config) => {
   const { isLoading, error, data, refetch } = useGraphqlQuery(
     `
   query (
-    $first: Int, $last: Int, $before: String, $after: String, $code: String, $name: String, 
+    $first: Int, $last: Int, $before: String, $after: String, $code: String, $name: String,
     $dateFrom: DateTime, $dateTo: DateTime, $location: Int, $showHistory: Boolean
     ) {
     products (
@@ -68,7 +68,7 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     threshold
     location {id uuid code name parent {id uuid name code}}
     program {id idProgram nameProgram validityDateFrom}
-    
+
     validityFrom
     validityTo
     dateFrom
@@ -95,7 +95,7 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     enrolmentDiscountPerc
     enrolmentDiscountPeriod
     ceilingInterpretation
-    
+
     gracePeriodEnrolment
     gracePeriodRenewal
     gracePeriodPayment
@@ -130,18 +130,18 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     ceiling
     ceilingIp
     ceilingOp
-  
+
     conversionProduct {
       id
       name
       code
       }
-    
+
     relativePrices {
       careType
       periods
     }
-    
+
   }
 `;
 
