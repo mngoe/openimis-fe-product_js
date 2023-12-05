@@ -19,7 +19,7 @@ const DEFAULT_CONFIG = {
   ],
   "refs": [
     { key: "product.ProductPicker", ref: ProductPicker },
-    { key: "product.ProductPicker.projection", ref: ["id", "code", "name", "location{id}", "program {id idProgram nameProgram validityDateFrom}"] },
+    { key: "product.ProductPicker.projection", ref: ["id", "code", "name", "location{id}", "program {id code idProgram nameProgram validityDateFrom}"] },
     { key: "product.ProductPicker.sort", ref: "product__code" },
 
     // Routes
