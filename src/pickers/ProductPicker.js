@@ -17,8 +17,8 @@ const ProductPicker = (props) => {
     filter,
     filterSelectedOptions,
     locationId,
+    canFetch
   } = props;
-
   const modulesManager = useModulesManager();
   const [filters, setFilters] = useState({ location: locationId });
   const { formatMessage } = useTranslations("product", modulesManager);
@@ -38,7 +38,7 @@ const ProductPicker = (props) => {
       withLabel={withLabel}
       withPlaceholder={withPlaceholder}
       readOnly={readOnly}
-      options={data.products ?? []}
+      options={ canFetch && canFetch == true ? data.products : canFetch == undefined ? data.products : [] }
       isLoading={isLoading}
       value={value}
       getOptionLabel={(option) => `${option.code} ${option.name}`}
