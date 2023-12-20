@@ -10,7 +10,9 @@ export const GRAPHQL_USE_PRODUCTS_PRODUCT_FRAGMENT = `
     code
     location {id name uuid code parent {id name uuid code}}
     dateFrom
-    dateTo
+    ageMinimal
+    ageMaximal
+    dateTo 
     maxMembers
     validityFrom
     validityTo
@@ -64,6 +66,8 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     uuid
     code
     name
+    ageMaximal
+    ageMinimal
     maxMembers
     threshold
     location {id uuid code name parent {id uuid name code}}

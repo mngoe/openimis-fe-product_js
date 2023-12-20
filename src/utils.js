@@ -12,6 +12,8 @@ export const validateProductForm = (values) => {
     "name",
     "maxMembers",
     "insurancePeriod",
+    "ageMinimal",
+    "ageMaximal",
     "maxInstallments",
     "gracePeriodPayment",
     "dateFrom",
@@ -30,6 +32,10 @@ export const validateProductForm = (values) => {
   if (values.dateFrom > values.dateTo) {
     errors.dateFrom = true;
     errors.dateTo = true;
+  }
+  if (values.ageMaximal < values.ageMinimal){
+    errors.ageMaximal = true;
+    errors.ageMinimal = true;
   }
 
   if (Object.keys(errors).length > 0) {
@@ -51,6 +57,8 @@ export const toFormValues = (product) => {
   return {
     ...product,
     lumpSum: product.lumpSum ?? 0,
+    ageMaximal: product.ageMaximal ?? 0,
+    ageMinimal: product.ageMinimal ?? 0,
     maxMembers: product.maxMembers ?? 0,
     insurancePeriod: product.insurancePeriod ?? 12,
     maxInstallments: product.maxInstallments ?? 1,
@@ -67,6 +75,8 @@ export const toInputValues = (values) => {
     id,
     code,
     location,
+    ageMinimal,
+    ageMaximal,
     program,
     conversionProduct,
     validityTo,
@@ -93,6 +103,8 @@ export const toInputValues = (values) => {
     services: hasEditedServices ? services.map(formatService) : undefined,
     items: hasEditedItems ? items.map(formatItem) : undefined,
     uuid,
+    ageMinimal,
+    ageMaximal,
     code: uuid ? undefined : code,
     dateFrom: toISODate(values.dateFrom),
     dateTo: toISODate(values.dateTo),
