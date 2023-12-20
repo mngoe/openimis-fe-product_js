@@ -12,8 +12,8 @@ export const validateProductForm = (values) => {
     "name",
     "maxMembers",
     "insurancePeriod",
-    // "ageMinimal",
-    // "ageMaximal",
+    "ageMinimal",
+    "ageMaximal",
     "maxInstallments",
     "gracePeriodPayment",
     "dateFrom",
@@ -32,6 +32,10 @@ export const validateProductForm = (values) => {
   if (values.dateFrom > values.dateTo) {
     errors.dateFrom = true;
     errors.dateTo = true;
+  }
+  if (values.ageMaximal < values.ageMinimal){
+    errors.ageMaximal = true;
+    errors.ageMinimal = true;
   }
 
   if (Object.keys(errors).length > 0) {
