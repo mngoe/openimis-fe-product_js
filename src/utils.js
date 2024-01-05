@@ -12,8 +12,8 @@ export const validateProductForm = (values) => {
     "name",
     "maxMembers",
     "insurancePeriod",
-    "ageMinimal",
-    "ageMaximal",
+    // "ageMinimal",
+    // "ageMaximal",
     "maxInstallments",
     "gracePeriodPayment",
     "dateFrom",
@@ -33,9 +33,11 @@ export const validateProductForm = (values) => {
     errors.dateFrom = true;
     errors.dateTo = true;
   }
-  if (values.ageMaximal < values.ageMinimal){
+  if(values.ageMaximal != '' && values.ageMinimal !=''){
+    if (values.ageMaximal < values.ageMinimal){
     errors.ageMaximal = true;
     errors.ageMinimal = true;
+    }
   }
 
   if (Object.keys(errors).length > 0) {
@@ -103,8 +105,8 @@ export const toInputValues = (values) => {
     services: hasEditedServices ? services.map(formatService) : undefined,
     items: hasEditedItems ? items.map(formatItem) : undefined,
     uuid,
-    ageMinimal,
-    ageMaximal,
+    ageMinimal: ageMinimal == '' ? null: ageMinimal,
+    ageMaximal: ageMaximal == '' ? null: ageMaximal,
     code: uuid ? undefined : code,
     dateFrom: toISODate(values.dateFrom),
     dateTo: toISODate(values.dateTo),
