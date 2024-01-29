@@ -1,4 +1,5 @@
 import messages_en from "./translations/en.json";
+import messages_fr from "./translations/fr.json";
 import ProductPicker from "./pickers/ProductPicker";
 
 import ProductsPage from "./pages/ProductsPage";
@@ -11,7 +12,7 @@ import {
 } from "./hooks";
 
 const DEFAULT_CONFIG = {
-  "translations": [{ key: "en", messages: messages_en }],
+  "translations": [{ key: "en", messages: messages_en }, {key: "fr", messages: messages_fr}],
   "core.Router": [
     { path: "admin/products", component: ProductsPage },
     { path: "admin/products/new", component: ProductDetailsPage },

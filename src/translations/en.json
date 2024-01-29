@@ -47,27 +47,22 @@
   "product.ProductSearcher.tableTitle": "{count} Products",
   "product.ProductSearcher.deleteProductTooltip": "Delete product",
   "product.ProductSearcher.openNewTab": "Open in new tab",
-
   "product.ProductForm.title": "Product {label}",
   "product.ProductForm.emptyTitle": "New Product",
   "product.FormMainPanel.validitySectionTitle": "Validity",
   "product.FormMainPanel.accountingSectionTitle": "Accounting",
-
   "product.TabsForm.contributionPlan": "Contribution Plan",
   "product.TabsForm.productItems": "Medical Items",
   "product.TabsForm.productServices": "Medical Services",
   "product.TabsForm.deductibles": "Deductibles & Ceilings",
   "product.TabsForm.pooling": "Pooling Management",
   "product.TabsForm.capitation": "Capitation Payment",
-
   "product.ContributionTabForm.discountsSectionTitle": "Discounts",
   "product.ContributionTabForm.graceSectionTitle": "Grace Periods",
-
   "product.ceilingDiscrimination": "Ceiling Discrimination",
   "product.ceilingDiscrimination.null": "Select a discriminant",
   "product.ceilingDiscrimination.HEALTH_FACILITY_TYPE": "Based on Health Facility Type",
   "product.ceilingDiscrimination.CLAIM_TYPE": "Based on Claim Type",
-
   "product.PoolingManagementTabForm.startCyclesSectionTitle": "Start Cycles",
   "product.PoolingManagementTabForm.relativePricingSectionTitle": "Relative Pricing",
   "product.relativePricingTypePicker": "Distribution Type",
@@ -78,7 +73,6 @@
   "product.relativePricingPeriodsPicker.12": "Month",
   "product.relativePricingPeriodsPicker.4": "Quarter",
   "product.relativePricingPeriodsPicker.1": "Year",
-
   "product.CapitationTabForm.capitationLevelsSectionTitle": "Levels of Capitation",
   "product.CapitationTabForm.weightsSectionTitle": "Weights Repartition",
   "product.CapitationTabForm.contributionShare": "Share of Contribution",
@@ -140,7 +134,6 @@
   "product.RelativePricesTable.careType.IN_PATIENT": "In - Patient",
   "product.RelativePricesTable.careType.OUT_PATIENT": "Out - Patient",
   "product.RelativePricesTable.careType.BOTH": "In & Out - Patient",
-
   "product.DeductiblesCeilingsTabForm.ceilingDiscriminationExplanation": "Specify whether Hospital and Non-Hospital care should be determined according to the type of level of health facility that provided health care (Hospital/Non-Hospital) or according to the type of health care acquired from the claim (In-patient/Out-Patient).",
   "product.DeductiblesCeilingsTabForm.all": "All",
   "product.DeductiblesCeilingsTabForm.hospitals": "Hospitals",
@@ -160,5 +153,15 @@
   "product.DeductiblesCeilingsTabForm.MaxTable.hopitalizations": "Hospitalizations",
   "product.DeductiblesCeilingsTabForm.MaxTable.antenatal": "Antenatal",
   "product.DeductiblesCeilingsTabForm.MaxTable.visits": "Visits",
-  "product.DeductiblesCeilingsTabForm.splitCeilings": "Split ceilings & deductibles"
+  "product.DeductiblesCeilingsTabForm.splitCeilings": "Split ceilings & deductibles",
+  "product.ProductSalesReport.dateFrom": "",
+  "product.ProductSalesReport.dateTo": "",
+  "product.ProductSalesReport.region": "",
+  "product.ProductSalesReport.district": "",
+  "product.ProductDerivedOperationalIndicators.month": "",
+  "product.ProductDerivedOperationalIndicators.year": "",
+  "product.ProductDerivedOperationalIndicators.product": "",
+  "product.ItemsOrServicesGrid.addServicesButton": "",
+  "product.ProductPicker.placehoder": "Search Product…",
+  "product.ProductPicker.null": "Any"
 }
