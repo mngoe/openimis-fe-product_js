@@ -1,5 +1,9 @@
 import React from "react";
 import moment from "moment";
+
+import { FormControlLabel, Grid, Checkbox } from "@material-ui/core";
+import { withTheme, withStyles } from "@material-ui/core/styles";
+
 import {
   combine,
   ControlledField,
@@ -10,8 +14,6 @@ import {
   withModulesManager,
   useDebounceCb,
 } from "@openimis/fe-core";
-import { FormControlLabel, Grid, Checkbox } from "@material-ui/core";
-import { withTheme, withStyles } from "@material-ui/core/styles";
 
 const styles = (theme) => ({
   form: {
@@ -31,7 +33,7 @@ const ProductFilters = (props) => {
     onChangeFilters([{ id, value }]);
   };
 
-  const onChangeDebounce = useDebounceCb(onValueChange, modulesManager.getConf("fe-admin", "debounceTime", 500));
+  const onChangeDebounce = useDebounceCb(onValueChange, modulesManager.getConf("fe-admin", "debounceTime", 200));
 
   return (
     <section className={classes.form}>
@@ -45,7 +47,7 @@ const ProductFilters = (props) => {
                 module="product"
                 name="code"
                 label="code"
-                value={filters?.code?.value}
+                value={filters?.code?.value || ""}
                 onChange={(value) => onChangeDebounce("code", value)}
               />
             </Grid>
@@ -60,7 +62,7 @@ const ProductFilters = (props) => {
                 module="product"
                 name="name"
                 label="name"
-                value={filters?.name?.value}
+                value={filters?.name?.value || ""}
                 onChange={(value) => onChangeDebounce("name", value)}
               />
             </Grid>
@@ -110,7 +112,7 @@ const ProductFilters = (props) => {
             <Grid item xs={3} className={classes.item}>
               <PublishedComponent
                 pubRef="core.DatePicker"
-                value={filters.date?.value}
+                value={filters?.dateFrom?.value}
                 module="product"
                 label="product.dateFrom"
                 onChange={(d) =>
@@ -133,7 +135,7 @@ const ProductFilters = (props) => {
             <Grid item xs={3} className={classes.item}>
               <PublishedComponent
                 pubRef="core.DatePicker"
-                value={filters.date?.value}
+                value={filters?.dateTo?.value}
                 module="product"
                 label="product.dateTo"
                 onChange={(d) =>
@@ -153,12 +155,12 @@ const ProductFilters = (props) => {
           module="product"
           id="showHistory"
           field={
-            <Grid item xs={12} className={classes.item}>
+            <Grid item xs={3} className={classes.item}>
               <FormControlLabel
                 control={
                   <Checkbox
                     color="primary"
-                    checked={filters?.showHistory?.value}
+                    checked={!!filters?.showHistory?.value}
                     onChange={() =>
                       onChangeFilters([
                         {

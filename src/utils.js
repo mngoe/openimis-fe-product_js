@@ -1,18 +1,15 @@
 import { graphqlWithVariables, toISODate } from "@openimis/fe-core";
 import _ from "lodash";
+import { EMPTY_STRING, LIMIT_COLUMNS, LIMIT_TYPES, PRICE_ORIGINS } from "./constants";
 
-export const validateProductForm = (values) => {
+export const validateProductForm = (values, rules, isProductCodeValid) => {
   values = { ...values };
-
-  delete values.validityTo;
-  delete values.validityFrom;
 
   const REQUIRED_FIELDS = [
     "code",
     "name",
     "maxMembers",
     "insurancePeriod",
-    "maxInstallments",
     "gracePeriodPayment",
     "dateFrom",
     "dateTo",
@@ -21,42 +18,86 @@ export const validateProductForm = (values) => {
   const errors = {};
 
   REQUIRED_FIELDS.forEach((field) => {
-    if (!values[field]) {
+    if (!values[field] && values[field] !== 0) {
       errors[field] = true;
     }
   });
+
+  if (values.validityTo) {
+    errors.validityTo = true;
+  }
+
+  delete values.validityTo;
+  delete values.validityFrom;
 
   if (values.dateFrom > values.dateTo) {
     errors.dateFrom = true;
     errors.dateTo = true;
   }
 
+  if (!isProductCodeValid) {
+    errors.isProductCodeInvalid = true;
+  }
+
   if (Object.keys(errors).length > 0) {
     console.warn(errors);
   }
 
-  if (values.relativePrices?.length > 0) {
-    values.relativePrices.forEach(({ periods }) => {
-      if (_.sum(periods.map((v) => parseFloat(v))) !== 100) {
-        errors.relativePrices = true;
+  if (values.items?.length > 0) {
+    values.items.forEach((item) => {
+      if (!LIMIT_COLUMNS.every((field) => validateItemOrService(item, field, rules))) {
+        errors.items = true;
       }
     });
+  }
+
+  if (values.services?.length > 0) {
+    values.services.forEach((service) => {
+      if (!LIMIT_COLUMNS.every((field) => validateItemOrService(service, field, rules))) {
+        errors.services = true;
+      }
+    });
+  }
+
+  if (Object.keys(errors).length > 0) {
+    console.warn(errors);
   }
 
   return Object.keys(errors).length === 0;
 };
 
-export const toFormValues = (product) => {
+export const getLimitType = (limitType) => {
+  return LIMIT_TYPES[limitType] ?? LIMIT_TYPES.C;
+};
+
+export const getPriceOrigin = (priceOrigin) => {
+  return PRICE_ORIGINS[priceOrigin] ?? PRICE_ORIGINS.P;
+};
+
+export const validateItemOrService = (itemOrService, field, rules) => {
+  if (!/^\d+(?:\.\d{0,2})?$/.test(itemOrService[field]?.toString())) return false; //check if up to two decimal points
+  return !(itemOrService[field] < rules.minLimitValue && itemOrService[field] > rules.maxLimitValue);
+};
+
+export const toFormValues = (product, shouldDuplicate) => {
   return {
     ...product,
+    code: shouldDuplicate ? "" : product.code ?? "",
     lumpSum: product.lumpSum ?? 0,
     maxMembers: product.maxMembers ?? 0,
     insurancePeriod: product.insurancePeriod ?? 12,
-    maxInstallments: product.maxInstallments ?? 1,
-    gracePeriodPayment: product.gracePeriodPayment ?? 1,
+    gracePeriodPayment: product.gracePeriodPayment ?? 0,
     gracePeriodEnrolment: product.gracePeriodEnrolment ?? 0,
     gracePeriodRenewal: product.gracePeriodRenewal ?? 0,
     ceilingInterpretation: product.ceilingInterpretation ?? "HEALTH_FACILITY_TYPE",
+  };
+};
+
+export const rulesToFormValues = (rules) => {
+  return {
+    ...rules,
+    minLimitValue: Number(rules.minLimitValue) ?? 0.0,
+    maxLimitValue: Number(rules.maxLimitValue) ?? 100.0,
   };
 };
 
@@ -73,30 +114,52 @@ export const toInputValues = (values) => {
     hasEditedItems,
     items,
     services,
+    ceilingType,
+    maxInstallments,
     ...inputValues
   } = values;
 
-  const formatService = ({ service, id, ...params }) => ({
-    serviceUuid: service.uuid,
-    ...params,
-  });
+  const formatService = ({ service, id, ...params }) => {
+    const { limitNoAdult, limitNoChild, waitingPeriodAdult, waitingPeriodChild, ...restParams } = params;
 
-  const formatItem = ({ item, id, ...params }) => ({
-    itemUuid: item.uuid,
-    ...params,
-  });
+    return {
+      serviceUuid: service.uuid,
+      limitNoAdult: limitNoAdult === EMPTY_STRING ? null : parseInt(limitNoAdult),
+      limitNoChild: limitNoChild === EMPTY_STRING ? null : parseInt(limitNoChild),
+      waitingPeriodAdult: waitingPeriodAdult === EMPTY_STRING ? null : parseInt(waitingPeriodAdult),
+      waitingPeriodChild: waitingPeriodChild === EMPTY_STRING ? null : parseInt(waitingPeriodChild),
+      ...restParams,
+    };
+  };
 
-  return {
+  const formatItem = ({ item, id, ...params }) => {
+    const { limitNoAdult, limitNoChild, waitingPeriodAdult, waitingPeriodChild, ...restParams } = params;
+
+    return {
+      itemUuid: item.uuid,
+      limitNoAdult: limitNoAdult === EMPTY_STRING ? null : parseInt(limitNoAdult),
+      limitNoChild: limitNoChild === EMPTY_STRING ? null : parseInt(limitNoChild),
+      waitingPeriodAdult: waitingPeriodAdult === EMPTY_STRING ? null : parseInt(waitingPeriodAdult),
+      waitingPeriodChild: waitingPeriodChild === EMPTY_STRING ? null : parseInt(waitingPeriodChild),
+      ...restParams,
+    };
+  };
+
+  const val = {
     ...inputValues,
     services: hasEditedServices ? services.map(formatService) : undefined,
     items: hasEditedItems ? items.map(formatItem) : undefined,
     uuid,
-    code: uuid ? undefined : code,
+    maxInstallments: maxInstallments ? Number(maxInstallments) : null,
+    code: code,
     dateFrom: toISODate(values.dateFrom),
     dateTo: toISODate(values.dateTo),
     locationUuid: location?.uuid,
     conversionProductUuid: conversionProduct?.uuid,
+    ceilingType: ceilingType,
   };
+
+  return val;
 };
 
 export const fetchConnection = (fetchFn) => {
@@ -129,11 +192,11 @@ export const loadProductItems = async (uuid, dispatch) => {
               priceOrigin
               waitingPeriodAdult
               waitingPeriodChild
-              
+
               limitationType
               limitationTypeR
               limitationTypeE
-              
+
               limitAdult
               limitChild
               limitAdultR
@@ -142,7 +205,7 @@ export const loadProductItems = async (uuid, dispatch) => {
               limitChildE
               limitNoAdult
               limitNoChild
-              
+
               ceilingExclusionAdult
               ceilingExclusionChild
               item {
@@ -190,11 +253,11 @@ export const loadProductServices = async (uuid, dispatch) => {
               priceOrigin
               waitingPeriodAdult
               waitingPeriodChild
-              
+
               limitationType
               limitationTypeR
               limitationTypeE
-              
+
               limitAdult
               limitChild
               limitAdultR
@@ -203,7 +266,7 @@ export const loadProductServices = async (uuid, dispatch) => {
               limitChildE
               limitNoAdult
               limitNoChild
-              
+
               ceilingExclusionAdult
               ceilingExclusionChild
               service {

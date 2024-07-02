@@ -10,24 +10,29 @@ export const GRAPHQL_USE_PRODUCTS_PRODUCT_FRAGMENT = `
     code
     location {id name uuid code parent {id name uuid code}}
     dateFrom
-    dateTo 
+    dateTo
     maxMembers
     validityFrom
     validityTo
-  } 
+  }
 `;
 
 export const useProductsQuery = ({ filters }, config) => {
   const modulesManager = useModulesManager();
+  // NOTE: The usage of `dateFrom_Lte: $dateFrom` and `dateTo_Gte: $dateTo` in the GraphQL query
+  // seems to imply a reserved naming convention. This might indicate a potential issue or limitation
+  // in the backend's handling of date range filters. The current solution is adjusted to align with 
+  // the backend's existing implementation. Further investigation or backend adjustments may be required
+  // for a more intuitive approach.
   const { isLoading, error, data, refetch } = useGraphqlQuery(
     `
   query (
-    $first: Int, $last: Int, $before: String, $after: String, $code: String, $name: String, 
+    $search: String, $first: Int, $last: Int, $before: String, $after: String, $code: String, $name: String, 
     $dateFrom: DateTime, $dateTo: DateTime, $location: Int, $showHistory: Boolean
     ) {
     products (
-      first: $first, last: $last, before: $before, after: $after, code_Icontains: $code, showHistory: $showHistory,
-      name_Icontains: $name, dateFrom_Gte: $dateFrom, dateTo_Lte: $dateTo, location: $location
+      search: $search, first: $first, last: $last, before: $before, after: $after, code_Icontains: $code, showHistory: $showHistory,
+      name_Icontains: $name, dateFrom_Lte: $dateFrom, dateTo_Gte: $dateTo, location: $location
       ) {
       edges {
         node {
@@ -66,7 +71,7 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     maxMembers
     threshold
     location {id uuid code name parent {id uuid name code}}
-    
+
     validityFrom
     validityTo
     dateFrom
@@ -93,7 +98,7 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     enrolmentDiscountPerc
     enrolmentDiscountPeriod
     ceilingInterpretation
-    
+
     gracePeriodEnrolment
     gracePeriodRenewal
     gracePeriodPayment
@@ -128,18 +133,14 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     ceiling
     ceilingIp
     ceilingOp
-  
+
     conversionProduct {
       id
       name
       code
       }
-    
-    relativePrices {
-      careType
-      periods
-    }
-    
+
+    administrationPeriod
   }
 `;
 
@@ -164,6 +165,50 @@ export const useProductQuery = ({ id, uuid }, config) => {
     error,
     refetch,
     data: data?.product,
+  };
+};
+
+export const usePageDisplayRulesQuery = (config) => {
+  const { isLoading, error, data, refetch } = useGraphqlQuery(
+    `
+    query {
+      pageDisplayRules {
+        minLimitValue
+        maxLimitValue
+    }
+  }
+  `,
+    config,
+  );
+
+  return {
+    isLoadingRules: isLoading,
+    errorRules: error,
+    refetchRules: refetch,
+    dataRules: data,
+  };
+};
+
+export const useLimitDefaultsQuery = (config) => {
+  const { isLoading, error, data, refetch } = useGraphqlQuery(
+    `
+    query {
+      limitDefaults {
+        defaultPriceOrigin
+        defaultLimit
+        defaultLimitCoInsuranceValue
+        defaultLimitFixedValue
+    }
+  }
+  `,
+    config,
+  );
+
+  return {
+    isLoadingLimitDefaults: isLoading,
+    errorLimitDefaults: error,
+    refetchLimitDefaults: refetch,
+    dataLimitDefaults: data,
   };
 };
 
@@ -194,6 +239,22 @@ export const useProductUpdateMutation = () => {
     }
   `,
     { onSuccess: (data) => data?.updateProduct },
+  );
+
+  return mutation;
+};
+
+export const useProductDuplicateMutation = () => {
+  const mutation = useGraphqlMutation(
+    `
+    mutation ($input: DuplicateProductMutationInput!) {
+      duplicateProduct(input: $input) {
+        internalId
+        clientMutationId
+      }
+    }
+  `,
+    { onSuccess: (data) => data?.duplicateProduct },
   );
 
   return mutation;

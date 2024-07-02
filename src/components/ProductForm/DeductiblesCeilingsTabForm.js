@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import _ from "lodash";
+import { useSelector } from "react-redux";
 import { useTranslations, useModulesManager, NumberInput, ConstantBasedPicker } from "@openimis/fe-core";
 import {
   Grid,
@@ -12,8 +14,13 @@ import {
   TableCell,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import _ from "lodash";
-import { CEILING_DISCRIMINATION, CEILING_TYPES } from "../../constants";
+
+import {
+  CEILING_DISCRIMINATION,
+  CEILING_TYPES,
+  HEALTH_FACILITY_TYPE,
+  CLAIM_TYPE
+} from "../../constants";
 import SectionTitle from "../SectionTitle";
 
 const useStyles = makeStyles((theme) => ({
@@ -28,11 +35,11 @@ const isInitialSplit = (product) =>
 
 const DeductiblesCeilingsTabForm = (props) => {
   const { edited, onEditedChanged, className, readOnly } = props;
+  const product = useSelector((state) => state.product.product ?? {});
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations("product", modulesManager);
   const [isSplit, _setSplit] = useState(isInitialSplit(edited));
   const classes = useStyles();
-
   const setSplit = (event) => {
     const isChecked = event.target.checked;
     onEditedChanged({
@@ -40,30 +47,29 @@ const DeductiblesCeilingsTabForm = (props) => {
       deductible: 0,
       deductibleIp: 0,
       deductibleOp: 0,
-      ceilingIp: 0,
-      ceilingOp: 0,
-      ceiling: 0,
-      maxPolicyExtraMemberIp: 0,
-      maxPolicyExtraMemberOp: 0,
-      maxPolicyExtraMember: 0,
-      maxCeilingPolicyIp: 0,
-      maxCeilingPolicyOp: 0,
-      maxCeilingPolicy: 0,
+      ceilingIp: undefined,
+      ceilingOp: undefined,
+      ceiling: undefined,
+      maxPolicyExtraMemberIp: undefined,
+      maxPolicyExtraMemberOp: undefined,
+      maxPolicyExtraMember: undefined,
+      maxCeilingPolicyIp: undefined,
+      maxCeilingPolicyOp: undefined,
+      maxCeilingPolicy: undefined,
     });
     _setSplit(isChecked);
   };
-
   const handleInputChange = (fieldName) => (value) => {
     onEditedChanged({ ...edited, [fieldName]: value });
   };
 
   useEffect(() => {
     if (!edited.ceilingType) {
-      onEditedChanged({ ...edited, ceilingType: "INSUREE" });
+      onEditedChanged({ ...edited, ceilingType: product?.ceilingType || "INSUREE" });
     }
   }, []);
 
-  useEffect(() => {}, [isSplit]);
+  useEffect(() => { }, [isSplit]);
   return (
     <Grid container className={className}>
       <Grid item xs={6} className={classes.item}>
@@ -83,13 +89,13 @@ const DeductiblesCeilingsTabForm = (props) => {
       </Grid>
       <Grid item xs={4} className={classes.item}>
         <ConstantBasedPicker
-          withNull
+          withNull={false}
           module="product"
           readOnly={readOnly}
-          value={edited.ceilingType}
+          value={edited?.ceilingType}
+          onChange={(ceilingType) => onEditedChanged({ ...edited, ceilingType })}
           constants={CEILING_TYPES}
           label="ceilingType"
-          onChange={(ceilingType) => onEditedChanged({ ...edited, ceilingType })}
         />
       </Grid>
       <Grid item xs={4} className={classes.item}>
@@ -108,10 +114,16 @@ const DeductiblesCeilingsTabForm = (props) => {
             <TableRow className={classes.tableTitle}>
               <TableCell width="200" />
               {!isSplit && <TableCell>{formatMessage("DeductiblesCeilingsTabForm.all")}</TableCell>}
-              {isSplit && (
+              {isSplit && edited.ceilingInterpretation === HEALTH_FACILITY_TYPE && (
                 <>
                   <TableCell>{formatMessage("DeductiblesCeilingsTabForm.hospitals")}</TableCell>
-                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.non_hospitals")}</TableCell>
+                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.nonHospitals")}</TableCell>
+                </>
+              )}
+              {isSplit && edited.ceilingInterpretation === CLAIM_TYPE && (
+                <>
+                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.inPatient")}</TableCell>
+                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.outPatient")}</TableCell>
                 </>
               )}
             </TableRow>
@@ -126,8 +138,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.deductibleIp}
-                      displayZero
+                      value={edited?.deductibleIp ?? 0}
                       onChange={handleInputChange("deductibleIp")}
                     />
                   </TableCell>
@@ -136,8 +147,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.deductibleOp}
-                      displayZero
+                      value={edited?.deductibleOp ?? 0}
                       onChange={handleInputChange("deductibleOp")}
                     />
                   </TableCell>
@@ -148,8 +158,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                     min={0}
                     module="product"
                     readOnly={readOnly}
-                    value={edited.deductible}
-                    displayZero
+                    value={edited?.deductible ?? 0}
                     onChange={handleInputChange("deductible")}
                   />
                 </TableCell>
@@ -167,10 +176,16 @@ const DeductiblesCeilingsTabForm = (props) => {
             <TableRow className={classes.tableTitle}>
               <TableCell width="200" />
               {!isSplit && <TableCell>{formatMessage("DeductiblesCeilingsTabForm.all")}</TableCell>}
-              {isSplit && (
+              {isSplit && edited.ceilingInterpretation === HEALTH_FACILITY_TYPE && (
                 <>
                   <TableCell>{formatMessage("DeductiblesCeilingsTabForm.hospitals")}</TableCell>
-                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.non_hospitals")}</TableCell>
+                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.nonHospitals")}</TableCell>
+                </>
+              )}
+              {isSplit && edited.ceilingInterpretation === CLAIM_TYPE && (
+                <>
+                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.inPatient")}</TableCell>
+                  <TableCell>{formatMessage("DeductiblesCeilingsTabForm.outPatient")}</TableCell>
                 </>
               )}
             </TableRow>
@@ -185,9 +200,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.ceilingIp}
-                      displayZero
+                      value={edited?.ceilingIp}
                       onChange={handleInputChange("ceilingIp")}
+                      onBlur={(event) => handleCeilingBlur("ceilingIp", event)}
+                      displayNa
+                      displayZero
                     />
                   </TableCell>
                   <TableCell>
@@ -195,9 +212,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.ceilingOp}
-                      displayZero
+                      value={edited?.ceilingOp}
                       onChange={handleInputChange("ceilingOp")}
+                      onBlur={(event) => handleCeilingBlur("ceilingOp", event)}
+                      displayNa
+                      displayZero
                     />
                   </TableCell>
                 </>
@@ -207,9 +226,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                     min={0}
                     module="product"
                     readOnly={readOnly}
-                    value={edited.ceiling}
-                    displayZero
+                    value={edited?.ceiling}
                     onChange={handleInputChange("ceiling")}
+                    onBlur={(event) => handleCeilingBlur("ceiling", event)}
+                    displayNa
+                    displayZero
                   />
                 </TableCell>
               )}
@@ -225,9 +246,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.maxPolicyExtraMemberIp}
-                      displayZero
+                      value={edited?.maxPolicyExtraMemberIp}
                       onChange={handleInputChange("maxPolicyExtraMemberIp")}
+                      onBlur={(event) => handleCeilingBlur("maxPolicyExtraMemberIp", event)}
+                      displayNa
+                      displayZero
                     />
                   </TableCell>
                   <TableCell>
@@ -235,9 +258,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.maxPolicyExtraMemberOp}
-                      displayZero
+                      value={edited?.maxPolicyExtraMemberOp}
                       onChange={handleInputChange("maxPolicyExtraMemberOp")}
+                      onBlur={(event) => handleCeilingBlur("maxPolicyExtraMemberOp", event)}
+                      displayNa
+                      displayZero
                     />
                   </TableCell>
                 </>
@@ -247,9 +272,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                     min={0}
                     module="product"
                     readOnly={readOnly}
-                    value={edited.maxPolicyExtraMember}
-                    displayZero
+                    value={edited?.maxPolicyExtraMember}
                     onChange={handleInputChange("maxPolicyExtraMember")}
+                    onBlur={(event) => handleCeilingBlur("maxPolicyExtraMember", event)}
+                    displayNa
+                    displayZero
                   />
                 </TableCell>
               )}
@@ -265,9 +292,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.maxCeilingPolicyIp}
-                      displayZero
+                      value={edited?.maxCeilingPolicyIp}
                       onChange={handleInputChange("maxCeilingPolicyIp")}
+                      onBlur={(event) => handleCeilingBlur("maxCeilingPolicyIp", event)}
+                      displayNa
+                      displayZero
                     />
                   </TableCell>
                   <TableCell>
@@ -275,9 +304,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                       min={0}
                       module="product"
                       readOnly={readOnly}
-                      value={edited.maxCeilingPolicyOp}
-                      displayZero
+                      value={edited?.maxCeilingPolicyOp}
                       onChange={handleInputChange("maxCeilingPolicyOp")}
+                      onBlur={(event) => handleCeilingBlur("maxCeilingPolicyOp", event)}
+                      displayNa
+                      displayZero
                     />
                   </TableCell>
                 </>
@@ -287,9 +318,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                     min={0}
                     module="product"
                     readOnly={readOnly}
-                    value={edited.maxCeilingPolicy}
-                    displayZero
+                    value={edited?.maxCeilingPolicy}
                     onChange={handleInputChange("maxCeilingPolicy")}
+                    onBlur={(event) => handleCeilingBlur("maxCeilingPolicy", event)}
+                    displayNa
+                    displayZero
                   />
                 </TableCell>
               )}
@@ -316,8 +349,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxNoConsultation}
-                  displayZero
+                  value={edited?.maxNoConsultation ?? 0}
                   onChange={handleInputChange("maxNoConsultation")}
                 />
               </TableCell>
@@ -326,9 +358,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxAmountConsultation}
-                  displayZero
+                  value={edited?.maxAmountConsultation}
                   onChange={handleInputChange("maxAmountConsultation")}
+                  onBlur={(event) => handleCeilingBlur("maxAmountConsultation", event)}
+                  displayNa
+                  displayZero
                 />
               </TableCell>
             </TableRow>
@@ -341,8 +375,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxNoSurgery}
-                  displayZero
+                  value={edited?.maxNoSurgery ?? 0}
                   onChange={handleInputChange("maxNoSurgery")}
                 />
               </TableCell>
@@ -351,9 +384,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxAmountSurgery}
-                  displayZero
+                  value={edited?.maxAmountSurgery}
                   onChange={handleInputChange("maxAmountSurgery")}
+                  onBlur={(event) => handleCeilingBlur("maxAmountSurgery", event)}
+                  displayNa
+                  displayZero
                 />
               </TableCell>
             </TableRow>
@@ -366,8 +401,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxNoDelivery}
-                  displayZero
+                  value={edited?.maxNoDelivery ?? 0}
                   onChange={handleInputChange("maxNoDelivery")}
                 />
               </TableCell>
@@ -376,9 +410,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxAmountDelivery}
-                  displayZero
+                  value={edited?.maxAmountDelivery}
                   onChange={handleInputChange("maxAmountDelivery")}
+                  onBlur={(event) => handleCeilingBlur("maxAmountDelivery", event)}
+                  displayNa
+                  displayZero
                 />
               </TableCell>
             </TableRow>
@@ -391,8 +427,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxNoHospitalization}
-                  displayZero
+                  value={edited?.maxNoHospitalization ?? 0}
                   onChange={handleInputChange("maxNoHospitalization")}
                 />
               </TableCell>
@@ -401,9 +436,11 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxAmountHospitalization}
-                  displayZero
+                  value={edited?.maxAmountHospitalization}
                   onChange={handleInputChange("maxAmountHospitalization")}
+                  onBlur={(event) => handleCeilingBlur("maxAmountHospitalization", event)}
+                  displayNa
+                  displayZero
                 />
               </TableCell>
             </TableRow>
@@ -416,8 +453,7 @@ const DeductiblesCeilingsTabForm = (props) => {
                   min={0}
                   module="product"
                   readOnly={readOnly}
-                  value={edited.maxNoAntenatal}
-                  displayZero
+                  value={edited?.maxNoAntenatal ?? 0}
                   onChange={handleInputChange("maxNoAntenatal")}
                 />
               </TableCell>
@@ -425,9 +461,12 @@ const DeductiblesCeilingsTabForm = (props) => {
                 <NumberInput
                   min={0}
                   module="product"
-                  value={edited.maxAmountAntenatal}
-                  displayZero
+                  readOnly={readOnly}
+                  value={edited?.maxAmountAntenatal}
                   onChange={handleInputChange("maxAmountAntenatal")}
+                  onBlur={(event) => handleCeilingBlur("maxAmountAntenatal", event)}
+                  displayNa
+                  displayZero
                 />
               </TableCell>
             </TableRow>
@@ -441,7 +480,6 @@ const DeductiblesCeilingsTabForm = (props) => {
                   module="product"
                   readOnly={readOnly}
                   value={edited.maxNoVisits}
-                  displayZero
                   onChange={handleInputChange("maxNoVisits")}
                 />
               </TableCell>
@@ -452,4 +490,5 @@ const DeductiblesCeilingsTabForm = (props) => {
     </Grid>
   );
 };
+
 export default DeductiblesCeilingsTabForm;

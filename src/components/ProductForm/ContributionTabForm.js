@@ -43,11 +43,10 @@ const ContributionTabForm = (props) => {
       <Grid item xs={3} className={classes.item}>
         <NumberInput
           module="product"
-          min={1}
           label="maxInstallments"
-          required
           readOnly={readOnly}
-          value={edited?.maxInstallments ?? 1}
+          displayZero
+          value={edited?.maxInstallments}
           onChange={(maxInstallments) => onEditedChanged({ ...edited, maxInstallments })}
         />
       </Grid>
@@ -151,8 +150,9 @@ const ContributionTabForm = (props) => {
           min={0}
           label="gracePeriodEnrolment"
           readOnly={readOnly}
-          value={edited?.gracePeriodEnrolment ?? ""}
-          onChange={(gracePeriodEnrolment) => onEditedChanged({ ...edited, gracePeriodEnrolment })}
+          value={edited?.gracePeriodEnrolment ?? 0}
+          onChange={(gracePeriodEnrolment) => onEditedChanged({ ...edited, gracePeriodEnrolment: Number(gracePeriodEnrolment) })}
+          displayZero={true}
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
@@ -161,8 +161,9 @@ const ContributionTabForm = (props) => {
           min={0}
           label="gracePeriodRenewal"
           readOnly={readOnly}
-          value={edited?.gracePeriodRenewal ?? ""}
-          onChange={(gracePeriodRenewal) => onEditedChanged({ ...edited, gracePeriodRenewal })}
+          value={edited?.gracePeriodRenewal ?? 0}
+          onChange={(gracePeriodRenewal) => onEditedChanged({ ...edited, gracePeriodRenewal: Number(gracePeriodRenewal) })}
+          displayZero={true}
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
@@ -172,8 +173,9 @@ const ContributionTabForm = (props) => {
           required
           label="gracePeriodPayment"
           readOnly={readOnly}
-          value={edited?.gracePeriodPayment ?? ""}
+          value={edited?.gracePeriodPayment}
           onChange={(gracePeriodPayment) => onEditedChanged({ ...edited, gracePeriodPayment })}
+          displayZero={true}
         />
       </Grid>
     </Grid>
