@@ -1,14 +1,26 @@
-import React from "react";
-import { withTheme, withStyles } from "@material-ui/core/styles";
+import React, { useEffect } from "react";
+import { connect, useDispatch } from "react-redux";
+
 import { Grid } from "@material-ui/core";
+import { withTheme, withStyles } from "@material-ui/core/styles";
+
 import {
-  useModulesManager,
-  useTranslations,
-  TextInput,
+  combine,
   NumberInput,
   PublishedComponent,
-  combine,
+  TextInput,
+  useModulesManager,
+  useTranslations,
+  ValidatedTextInput,
+  withModulesManager,
 } from "@openimis/fe-core";
+import {
+  clearProduct,
+  fetchProduct,
+  productCodeSetValid,
+  productCodeValidationCheck,
+  productCodeValidationClear,
+} from "../../actions";
 import SectionTitle from "../SectionTitle";
 
 const styles = (theme) => ({
@@ -16,23 +28,55 @@ const styles = (theme) => ({
 });
 
 const MainPanelForm = (props) => {
-  const { classes, edited, onEditedChanged, readOnly } = props;
+  const {
+    autoFocus,
+    classes,
+    edited,
+    onEditedChanged,
+    readOnly,
+    isProductCodeValid,
+    isProductCodeValidating,
+    productCodeValidationError,
+    isDuplicate,
+  } = props;
+
+  const dispatch = useDispatch();
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations("product.FormMainPanel", modulesManager);
+
+  useEffect(() => {
+    if (edited?.id) dispatch(fetchProduct(modulesManager, { "productId": edited.id }));
+    return () => dispatch(clearProduct());
+  }, [edited?.id]);
+
+  const shouldValidate = (inputValue) => {
+    const { savedProductCode } = props;
+    if ((!!edited.id && inputValue === savedProductCode) || (!savedProductCode && !!edited.id)) return false;
+    return true;
+  };
 
   return (
     <Grid container direction="row">
       <Grid item xs={3} className={classes.item}>
-        <TextInput
+        <ValidatedTextInput
+          itemQueryIdentifier="productCode"
+          action={productCodeValidationCheck}
+          autoFocus={autoFocus}
+          clearAction={productCodeValidationClear}
+          setValidAction={productCodeSetValid}
+          shouldValidate={shouldValidate}
+          codeTakenLabel="product.alreadyTaken"
+          readOnly={readOnly}
+          isValid={isProductCodeValid}
+          isValidating={isProductCodeValidating}
+          validationError={productCodeValidationError}
+          label="product.code"
           module="product"
-          required
-          label="code"
-          readOnly={Boolean(edited?.id) || readOnly}
-          value={edited?.code ?? ""}
           onChange={(code) => onEditedChanged({ ...edited, code })}
+          required={true}
+          value={edited?.code ?? ""}
         />
       </Grid>
-
       <Grid item xs={3} className={classes.item}>
         <TextInput
           module="product"
@@ -48,7 +92,7 @@ const MainPanelForm = (props) => {
           pubRef="location.RegionPicker"
           value={edited.location?.parent ?? edited.location}
           readOnly={readOnly}
-          withNull
+          withNull={false}
           onChange={(location) => onEditedChanged({ ...edited, location })}
         />
       </Grid>
@@ -57,7 +101,7 @@ const MainPanelForm = (props) => {
           region={edited.location?.parent || edited.location}
           value={edited.location?.parent ? edited.location : null}
           pubRef="location.DistrictPicker"
-          withNull={true}
+          withNull={false}
           readOnly={readOnly}
           onChange={(location) => onEditedChanged({ ...edited, location: location || edited.location?.parent })}
         />
@@ -71,17 +115,18 @@ const MainPanelForm = (props) => {
           readOnly={readOnly}
           value={edited?.maxMembers ?? ""}
           onChange={(maxMembers) => onEditedChanged({ ...edited, maxMembers })}
+          allowDecimals={false}
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
         <NumberInput
           module="product"
           min={0}
-          displayZero
           label="memberTreshold"
           readOnly={readOnly}
           value={edited?.threshold ?? ""}
           onChange={(threshold) => onEditedChanged({ ...edited, threshold })}
+          allowDecimals={false}
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
@@ -93,6 +138,7 @@ const MainPanelForm = (props) => {
           readOnly={readOnly}
           value={edited?.insurancePeriod ?? ""}
           onChange={(insurancePeriod) => onEditedChanged({ ...edited, insurancePeriod })}
+          allowDecimals={false}
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
@@ -103,6 +149,7 @@ const MainPanelForm = (props) => {
           readOnly={readOnly}
           value={edited?.administrationPeriod ?? ""}
           onChange={(administrationPeriod) => onEditedChanged({ ...edited, administrationPeriod })}
+          allowDecimals={false}
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
@@ -157,8 +204,13 @@ const MainPanelForm = (props) => {
           required
           module="product"
           label="dateFrom"
-          readOnly={readOnly}
+          disablePast={!edited?.uuid}
+          readOnly={(Boolean(edited?.uuid) && !isDuplicate) || readOnly}
           onChange={(dateFrom) => onEditedChanged({ ...edited, dateFrom })}
+          // NOTE: maxDate cannot be passed if endDate does not exist.
+          // Passing any other falsy value will block months manipulation.
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...(edited.dateTo ? { maxDate: edited.dateTo } : null)}
         />
       </Grid>
       <Grid item xs={4} className={classes.item}>
@@ -168,8 +220,13 @@ const MainPanelForm = (props) => {
           required
           module="product"
           label="dateTo"
+          disablePast={!!edited?.uuid}
           readOnly={readOnly}
           onChange={(dateTo) => onEditedChanged({ ...edited, dateTo })}
+          // NOTE: minDate cannot be passed if startDate does not exist.
+          // Passing any other falsy value will block months manipulation.
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...(edited.dateFrom ? { minDate: edited.dateFrom } : null)}
         />
       </Grid>
       <Grid item xs={4} className={classes.item}>
@@ -207,6 +264,13 @@ const MainPanelForm = (props) => {
   );
 };
 
-const enhance = combine(withTheme, withStyles(styles));
+const mapStateToProps = (store) => ({
+  isProductCodeValid: store.product.validationFields?.productCode?.isValid,
+  isProductCodeValidating: store.product.validationFields?.productCode?.isValidating,
+  productCodeValidationError: store.product.validationFields?.productCode?.validationError,
+  savedProductCode: store.product?.product?.code,
+});
+
+const enhance = combine(withModulesManager, withTheme, withStyles(styles), connect(mapStateToProps));
 
 export default enhance(MainPanelForm);
