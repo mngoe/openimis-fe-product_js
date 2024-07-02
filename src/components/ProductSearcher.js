@@ -1,26 +1,43 @@
 import React, { useState, useCallback } from "react";
 import { useProductsQuery } from "../hooks";
-import { Searcher, useTranslations, useModulesManager, ConfirmDialog } from "@openimis/fe-core";
+import { withTheme, withStyles } from "@material-ui/core/styles";
+import { Searcher, useTranslations, combine, useModulesManager, ConfirmDialog } from "@openimis/fe-core";
 import ProductFilters from "./ProductFilters";
 import { Tooltip, IconButton } from "@material-ui/core";
 import { Tab as TabIcon, Delete as DeleteIcon } from "@material-ui/icons";
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 const isRowDisabled = (_, row) => Boolean(row.validityTo);
 const formatLocation = (location) => (location ? `${location.code} - ${location.name}` : null);
 
+const styles = (theme) => ({
+  horizontalButtonContainer: theme.buttonContainer.horizontal,
+});
+
 const ProductSearcher = (props) => {
-  const { cacheFiltersKey, onDelete, canDelete, onDoubleClick } = props;
+  const { cacheFiltersKey, classes, onDelete, canDelete, onDoubleClick, onDuplicate, canDuplicate } = props;
   const modulesManager = useModulesManager();
   const { formatMessage, formatDateFromISO, formatMessageWithValues } = useTranslations("product", modulesManager);
   const [filters, setFilters] = useState({});
   const [productToDelete, setProductToDelete] = useState(null);
   const { data, isLoading, error, refetch } = useProductsQuery({ filters }, { skip: true, keepStale: true });
   const filtersToQueryParam = useCallback((state) => {
-    const params = {
-      first: state.pageSize,
-      after: state.afterCursor,
-      before: state.beforeCursor,
-    };
+    let params = {};
+    if (!state.beforeCursor && !state.afterCursor) {
+      params = {first: state.pageSize};
+    }
+    if (state.afterCursor) {
+      params = {
+        after: state.afterCursor,
+        first: state.pageSize,
+      }
+    }
+    if (state.beforeCursor) {
+      params = {
+        before: state.beforeCursor,
+        last: state.pageSize,
+      }
+    }
     Object.entries(state.filters).forEach(([filterKey, filter]) => {
       params[filterKey] = filter.filter ?? filter.value;
     });
@@ -63,24 +80,29 @@ const ProductSearcher = (props) => {
       (p) => formatDateFromISO(p.dateFrom),
       (p) => formatDateFromISO(p.dateTo),
       (p) => p.maxMembers,
-
-      (p) =>
-        !filters.showHistory?.value ? (
-          <>
-            <Tooltip title={formatMessage("ProductSearcher.openNewTab")}>
-              <IconButton onClick={() => onDoubleClick(p, true)}>
-                <TabIcon />
+      (p) => (
+        <div className={classes.horizontalButtonContainer}>
+          <Tooltip title={formatMessage("ProductSearcher.openNewTab")}>
+            <IconButton onClick={() => onDoubleClick(p, true)}>
+              <TabIcon />
+            </IconButton>
+          </Tooltip>
+          {canDuplicate(p) && (
+            <Tooltip title={formatMessage("ProductSearcher.duplicateProductTooltip")}>
+              <IconButton onClick={() => onDuplicate(p, true)}>
+                <FileCopyIcon />
               </IconButton>
             </Tooltip>
-            {canDelete(p) && (
-              <Tooltip title={formatMessage("ProductSearcher.deleteProductTooltip")}>
-                <IconButton onClick={() => setProductToDelete(p)}>
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-          </>
-        ) : null,
+          )}
+          {canDelete(p) && (
+            <Tooltip title={formatMessage("ProductSearcher.deleteProductTooltip")}>
+              <IconButton onClick={() => setProductToDelete(p)}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </div>
+      ),
     ];
   }, []);
   return (
@@ -118,4 +140,6 @@ const ProductSearcher = (props) => {
   );
 };
 
-export default ProductSearcher;
+const enhance = combine(withTheme, withStyles(styles));
+
+export default enhance(ProductSearcher);
