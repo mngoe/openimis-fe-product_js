@@ -7,12 +7,12 @@ import {
   formatMessage as globalFormatMessage,
   PublishedComponent,
 } from "@openimis/fe-core";
-import { loadProductServices } from "../../utils";
+import {getLimitType, getPriceOrigin, loadProductServices} from "../../utils";
 import _ from "lodash";
 import GenericItemsTabForm from "./GenericItemsTabForm";
 
 const ServicesTabForm = (props) => {
-  const { edited, edited_id, onEditedChanged } = props;
+  const { edited, edited_id, onEditedChanged, limitType, priceOrigin, getLimitValueSwitch, readOnly } = props;
   const modulesManager = useModulesManager();
   const intl = useIntl();
   const dispatch = useDispatch();
@@ -69,7 +69,7 @@ const ServicesTabForm = (props) => {
       setLoading(true);
       loadProductServices(edited_id, dispatch).then((services) => {
         setLoading(false);
-        onEditedChanged({ ...edited, services });
+        onEditedChanged({ ...edited, services, hasEditedServices: true });
       });
     }
   }, []);
@@ -81,18 +81,16 @@ const ServicesTabForm = (props) => {
     const newServices = selection.map((service) => ({
       id: service.id,
       service,
-      priceOrigin: "PRICELIST",
-      limitationType: "FIXED_AMOUNT",
-      limitationTypeR: "FIXED_AMOUNT",
-      limitationTypeE: "FIXED_AMOUNT",
-      limitAdult: 100.00,
-      limitAdultR: 100.00,
-      limitAdultE: 100.00,
-      limitChild: 100.00,
-      limitChildR: 100.00,
-      limitChildE: 100.00,
-      limitNoAdult: 100.00,
-      limitNoChild: 100.00,
+      priceOrigin: getPriceOrigin(priceOrigin),
+      limitationType: getLimitType(limitType),
+      limitationTypeR: getLimitType(limitType),
+      limitationTypeE: getLimitType(limitType),
+      limitAdult: getLimitValueSwitch(limitType),
+      limitAdultR: getLimitValueSwitch(limitType),
+      limitAdultE: getLimitValueSwitch(limitType),
+      limitChild: getLimitValueSwitch(limitType),
+      limitChildR: getLimitValueSwitch(limitType),
+      limitChildE: getLimitValueSwitch(limitType),
     }));
     onChange(newServices.concat(edited.services ?? []));
   };
@@ -107,6 +105,9 @@ const ServicesTabForm = (props) => {
       rows={edited.services ?? []}
       onChange={onChange}
       onAdd={onAdd}
+      readOnly={readOnly}
+      addButtonLabel={formatMessage("ItemsOrServicesGrid.addServicesButton")}
+      getLimitValueSwitch={getLimitValueSwitch}
       Picker={(props) => (
         <PublishedComponent
           filterOptions={filterDialogOptions}
