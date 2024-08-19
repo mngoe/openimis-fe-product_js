@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useIntl } from "react-intl";
+import _ from "lodash";
+
 import {
   useTranslations,
   useModulesManager,
   formatMessage as globalFormatMessage,
   PublishedComponent,
 } from "@openimis/fe-core";
-import { loadProductItems } from "../../utils";
-import _ from "lodash";
+import { getLimitType, getPriceOrigin, loadProductItems } from "../../utils";
 import GenericItemsTabForm from "./GenericItemsTabForm";
 
 const ItemsTabForm = (props) => {
-  const { edited, edited_id, onEditedChanged } = props;
+  const { edited, edited_id, onEditedChanged, limitType, priceOrigin, getLimitValueSwitch, readOnly } = props;
   const modulesManager = useModulesManager();
   const intl = useIntl();
   const dispatch = useDispatch();
@@ -69,7 +70,7 @@ const ItemsTabForm = (props) => {
       setLoading(true);
       loadProductItems(edited_id, dispatch).then((items) => {
         setLoading(false);
-        onEditedChanged({ ...edited, items });
+        onEditedChanged({ ...edited, items, hasEditedItems: true });
       });
     }
   }, []);
@@ -82,18 +83,16 @@ const ItemsTabForm = (props) => {
     const newItems = selection.map((item) => ({
       id: item.id,
       item,
-      priceOrigin: "PRICELIST",
-      limitationType: "FIXED_AMOUNT",
-      limitationTypeR: "FIXED_AMOUNT",
-      limitationTypeE: "FIXED_AMOUNT",
-      limitAdult: 100.00,
-      limitAdultR: 100.00,
-      limitAdultE: 100.00,
-      limitChild: 100.00,
-      limitChildR: 100.00,
-      limitChildE: 100.00,
-      limitNoAdult: 100.00,
-      limitNoChild: 100.00,
+      priceOrigin: getPriceOrigin(priceOrigin),
+      limitationType: getLimitType(limitType),
+      limitationTypeR: getLimitType(limitType),
+      limitationTypeE: getLimitType(limitType),
+      limitAdult: getLimitValueSwitch(limitType),
+      limitAdultR: getLimitValueSwitch(limitType),
+      limitAdultE: getLimitValueSwitch(limitType),
+      limitChild: getLimitValueSwitch(limitType),
+      limitChildR: getLimitValueSwitch(limitType),
+      limitChildE: getLimitValueSwitch(limitType),
     }));
     onChange(newItems.concat(edited.items ?? []));
   };
@@ -107,7 +106,10 @@ const ItemsTabForm = (props) => {
       isLoading={isLoading}
       rows={edited.items ?? []}
       onChange={onChange}
+      readOnly={readOnly}
+      addButtonLabel={formatMessage("ItemsOrServicesGrid.addItemsButton")}
       onAdd={onAdd}
+      getLimitValueSwitch={getLimitValueSwitch}
       Picker={(props) => (
         <PublishedComponent
           filterOptions={filterDialogOptions}
