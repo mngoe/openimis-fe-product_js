@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Typography, Box } from "@material-ui/core";
 import { withTheme, withStyles } from "@material-ui/styles";
-import {
-  combine,
-  useTranslations,
-  useModulesManager,
-  FormattedMessage,
-  NumberInput,
-  ConstantBasedPicker,
-} from "@openimis/fe-core";
+import { combine, useTranslations, useModulesManager, FormattedMessage, NumberInput } from "@openimis/fe-core";
 import SectionTitle from "../SectionTitle";
-import RelativePricesTable from "./RelativePricesTable";
 
 const parseCycle = (cycle) => {
   const [date, month] = cycle?.split("-") ?? [];
@@ -26,7 +18,6 @@ const CycleInput = React.memo((props) => {
   }, [value]);
 
   useEffect(() => {
-    if (currentValue.untouched) return;
     if (currentValue.date && currentValue.month) {
       onChange(
         `${Number(currentValue.date).toString().padStart(2, "0")}-${Number(currentValue.month)
@@ -74,74 +65,10 @@ const CycleInput = React.memo((props) => {
   );
 });
 
-const DISTRIBUTION_TYPES = ["disabled", "enabled", "split"];
-const DISTRIBUTION_PERIODS = [12, 4, 1];
-
-const createPeriods = (nPeriods) => Array.from(Array(nPeriods)).map(() => 0);
-
 const PoolingManagementTabForm = (props) => {
   const { edited, onEditedChanged, readOnly, classes } = props;
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations("product.PoolingManagementTabForm", modulesManager);
-
-  const [distributionType, setDistributionType] = useState();
-  const [distributionPeriods, setDistributionPeriods] = useState();
-
-  const relativePrices = edited.relativePrices || [];
-
-  const handleTypeChange = (value) => {
-    const nPeriods = distributionPeriods || 12;
-    setDistributionType(value);
-    setDistributionPeriods(nPeriods);
-    switch (value) {
-      case "disabled":
-        onEditedChanged({ ...edited, relativePrices: [] });
-        break;
-      case "enabled":
-        onEditedChanged({
-          ...edited,
-          relativePrices: [{ careType: "BOTH", periods: createPeriods(nPeriods) }],
-        });
-        break;
-      case "split":
-        onEditedChanged({
-          ...edited,
-          relativePrices: [
-            { careType: "IN_PATIENT", periods: createPeriods(nPeriods) },
-            { careType: "OUT_PATIENT", periods: createPeriods(nPeriods) },
-          ],
-        });
-        break;
-    }
-  };
-
-  const handlePeriodsChange = (value) => {
-    const newRelativePrices = relativePrices.map((rp) => ({ careType: rp.careType, periods: createPeriods(value) }));
-    onEditedChanged({ ...edited, relativePrices: newRelativePrices });
-    setDistributionPeriods(value);
-  };
-
-  useEffect(() => {
-    // If the relative pricing distribution is different for the In-patient, Out-patient or Both, let's keep it like that
-    const isLegacy =
-      relativePrices?.length > 0 && !relativePrices.every((x) => x.periods.length === relativePrices[0].periods.length);
-
-    if (isLegacy) return;
-
-    if (relativePrices?.length === 1 && relativePrices?.some((x) => x.careType === "BOTH")) {
-      setDistributionType("enabled");
-    } else if (relativePrices?.length === 2) {
-      setDistributionType("split");
-    } else if (!relativePrices?.length) {
-      setDistributionType("disabled");
-    }
-
-    if (relativePrices.length > 0) {
-      setDistributionPeriods(relativePrices[0].periods.length || 12);
-    } else {
-      setDistributionPeriods(12);
-    }
-  }, []);
 
   return (
     <Grid container>
@@ -186,44 +113,6 @@ const PoolingManagementTabForm = (props) => {
           />
         </Grid>
       </Grid>
-
-      <Grid item xs={12}>
-        <SectionTitle label={formatMessage("relativePricingSectionTitle")} />
-      </Grid>
-      <>
-        <Grid item xs={3} className={classes.item}>
-          <ConstantBasedPicker
-            module="product"
-            readOnly={readOnly}
-            constants={DISTRIBUTION_TYPES}
-            label="relativePricingTypePicker"
-            onChange={handleTypeChange}
-            withNull={false}
-            value={distributionType}
-          />
-        </Grid>
-        {distributionType && distributionType !== "disabled" && (
-          <Grid item xs={3} className={classes.item}>
-            <ConstantBasedPicker
-              module="product"
-              constants={DISTRIBUTION_PERIODS}
-              label="relativePricingPeriodsPicker"
-              onChange={handlePeriodsChange}
-              withNull={false}
-              value={distributionPeriods}
-            />
-          </Grid>
-        )}
-      </>
-      {distributionType !== "disabled" && relativePrices?.length > 0 && (
-        <Grid item xs={12} className={classes.item}>
-          <RelativePricesTable
-            readOnly={readOnly}
-            relativePrices={relativePrices}
-            onChange={(relativePrices) => onEditedChanged({ ...edited, relativePrices })}
-          />
-        </Grid>
-      )}
     </Grid>
   );
 };
