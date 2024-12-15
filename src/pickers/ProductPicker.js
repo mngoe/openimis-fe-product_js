@@ -38,13 +38,14 @@ const ProductPicker = (props) => {
   } = useProductsQuery({ filters }, { skip: true });
   const shouldShowTooltip = products.length >= PRODUCT_QUANTITY_LIMIT && !value && !currentString;
 
+  console.log( products);
   return (
     <Autocomplete
       multiple={multiple}
       required={required}
       error={error}
       readOnly={readOnly}
-      options={ canFetch && canFetch == true ? data.products : canFetch == undefined ? data.products : [] }
+      options={ canFetch && canFetch == true ? products : canFetch == undefined ? products : [] }
       isLoading={isLoading}
       value={value}
       getOptionLabel={(option) => `${option.code} ${option.name}`}
