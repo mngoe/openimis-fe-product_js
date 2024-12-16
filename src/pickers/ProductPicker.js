@@ -38,7 +38,6 @@ const ProductPicker = (props) => {
   } = useProductsQuery({ filters }, { skip: true });
   const shouldShowTooltip = products.length >= PRODUCT_QUANTITY_LIMIT && !value && !currentString;
 
-  console.log( products);
   return (
     <Autocomplete
       multiple={multiple}
