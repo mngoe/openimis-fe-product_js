@@ -22,6 +22,7 @@ const ProductPicker = (props) => {
     filter,
     filterSelectedOptions,
     locationId,
+    enrollmentDate,
     canFetch
   } = props;
   const modulesManager = useModulesManager();
@@ -56,6 +57,8 @@ const ProductPicker = (props) => {
           first: PRODUCT_QUANTITY_LIMIT,
           search,
           location: locationId,
+          dateFrom: moment(enrollmentDate).format(DATE_FORMAT),
+          dateTo: moment(enrollmentDate).format(DATE_FORMAT),
         }))
       }
       renderInput={(inputProps) => (
