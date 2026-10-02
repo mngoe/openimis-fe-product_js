@@ -10,8 +10,6 @@ export const validateProductForm = (values, rules, isProductCodeValid) => {
     "name",
     "maxMembers",
     "insurancePeriod",
-    // "ageMinimal",
-    // "ageMaximal",
     "gracePeriodPayment",
     "dateFrom",
     "dateTo",

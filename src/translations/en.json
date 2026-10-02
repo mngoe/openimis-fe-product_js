@@ -52,29 +52,23 @@
   "product.ProductSearcher.deleteProductTooltip": "Delete product",
   "product.ProductSearcher.duplicateProductTooltip": "Duplicate product",
   "product.ProductSearcher.openNewTab": "Open in new tab",
-
   "product.ProductForm.title": "Product {label}",
   "product.ProductForm.emptyTitle": "New Product",
   "product.FormMainPanel.validitySectionTitle": "Validity",
   "product.FormMainPanel.accountingSectionTitle": "Accounting",
-
   "product.TabsForm.contributionPlan": "Contribution Plan",
   "product.TabsForm.productItems": "Medical Items",
   "product.TabsForm.productServices": "Medical Services",
   "product.TabsForm.deductibles": "Deductibles & Ceilings",
   "product.TabsForm.pooling": "Pooling Management",
   "product.TabsForm.capitation": "Capitation Payment",
-
   "product.ContributionTabForm.discountsSectionTitle": "Discounts",
   "product.ContributionTabForm.graceSectionTitle": "Grace Periods",
-
   "product.ceilingDiscrimination": "Ceiling Discrimination",
   "product.ceilingDiscrimination.null": "Select a discriminant",
   "product.ceilingDiscrimination.HEALTH_FACILITY_TYPE": "Based on Health Facility Type",
   "product.ceilingDiscrimination.CLAIM_TYPE": "Based on Claim Type",
-
   "product.PoolingManagementTabForm.startCyclesSectionTitle": "Start Cycles",
-
   "product.CapitationTabForm.capitationLevelsSectionTitle": "Levels of Capitation",
   "product.CapitationTabForm.weightsSectionTitle": "Weights Repartition",
   "product.CapitationTabForm.contributionShare": "Share of Contribution",
@@ -132,7 +126,6 @@
   "product.ProductItemsDialog.submit": "Add {count} items",
   "product.ProductItemsDialog.emptySubmit": "Add items",
   "product.ProductItemsDialog.cancel": "Cancel",
-
   "product.DeductiblesCeilingsTabForm.ceilingDiscriminationExplanation": "Specify whether Hospital and Non-Hospital care should be determined according to the type of level of health facility that provided health care (Hospital/Non-Hospital) or according to the type of health care acquired from the claim (In-patient/Out-Patient).",
   "product.DeductiblesCeilingsTabForm.all": "All",
   "product.DeductiblesCeilingsTabForm.hospitals": "Hospitals",
@@ -155,6 +148,8 @@
   "product.DeductiblesCeilingsTabForm.MaxTable.antenatal": "Antenatal",
   "product.DeductiblesCeilingsTabForm.MaxTable.visits": "Visits",
   "product.DeductiblesCeilingsTabForm.splitCeilings": "Split ceilings & deductibles",
+  "product.ProductPicker.placehoder": "Search Product…",
+  "product.ProductPicker.null": "Any",
 
   "product.createMutation.label": "Create product {name}",
   "product.updateMutation.label": "Update product {name}",
@@ -167,5 +162,7 @@
   "product.ProductSalesReport.district": "District",
   "product.ProductDerivedOperationalIndicators.month": "Month",
   "product.ProductDerivedOperationalIndicators.year": "Year",
-  "product.ProductDerivedOperationalIndicators.product": "Product"
+  "product.ProductDerivedOperationalIndicators.product": "Product",
+  "product.ageMin": "Minimal age",
+  "product.ageMax": "Maximal age"
 }

@@ -1,5 +1,5 @@
 import messages_en from "./translations/en.json";
-import messages_fr from "./translations/fr.json"
+import messages_fr from "./translations/fr.json";
 import ProductPicker from "./pickers/ProductPicker";
 import { reducer } from "./reducer";
 import { decodeId } from "@openimis/fe-core";
@@ -18,10 +18,7 @@ import ProductSalesReport from "./reports/ProductSalesReport";
 import ProductDerivedOperationalIndicators from "./reports/ProductDerivedOperationalIndicators";
 
 const DEFAULT_CONFIG = {
-  "translations": [
-    { key: "en", messages: messages_en },
-    { key: "fr", messages: messages_fr }
-  ],
+  "translations": [{ key: "en", messages: messages_en }, {key: "fr", messages: messages_fr}],
   "reducers": [{ key: "product", reducer }],
   "reports": [
     {
