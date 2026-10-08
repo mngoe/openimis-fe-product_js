@@ -17,6 +17,8 @@ export const GRAPHQL_USE_PRODUCTS_PRODUCT_FRAGMENT = `
     validityFrom
     validityTo
     program {id code idProgram nameProgram validityDateFrom}
+    ageMinimal
+    ageMaximal
   }
 `;
 
@@ -77,6 +79,11 @@ export const GRAPHQL_USE_PRODUCT_PRODUCT_FRAGMENT = `
     threshold
     location {id uuid code name parent {id uuid name code}}
     program {id idProgram nameProgram validityDateFrom}
+<<<<<<< HEAD
+=======
+    ageMinimal
+    ageMaximal
+>>>>>>> bb1259b361d378b31abf0a38dd98bd01beaadee3
 
     validityFrom
     validityTo
