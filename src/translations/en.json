@@ -146,14 +146,6 @@
   "product.DeductiblesCeilingsTabForm.MaxTable.antenatal": "Antenatal",
   "product.DeductiblesCeilingsTabForm.MaxTable.visits": "Visits",
   "product.DeductiblesCeilingsTabForm.splitCeilings": "Split ceilings & deductibles",
-  "product.ProductSalesReport.dateFrom": "",
-  "product.ProductSalesReport.dateTo": "",
-  "product.ProductSalesReport.region": "",
-  "product.ProductSalesReport.district": "",
-  "product.ProductDerivedOperationalIndicators.month": "",
-  "product.ProductDerivedOperationalIndicators.year": "",
-  "product.ProductDerivedOperationalIndicators.product": "",
-  "product.ItemsOrServicesGrid.addServicesButton": "",
   "product.ProductPicker.placehoder": "Search Product…",
   "product.ProductPicker.null": "Any",
 
@@ -168,5 +160,7 @@
   "product.ProductSalesReport.district": "District",
   "product.ProductDerivedOperationalIndicators.month": "Month",
   "product.ProductDerivedOperationalIndicators.year": "Year",
-  "product.ProductDerivedOperationalIndicators.product": "Product"
+  "product.ProductDerivedOperationalIndicators.product": "Product",
+  "product.ageMin": "Minimal age",
+  "product.ageMax": "Maximal age"
 }
