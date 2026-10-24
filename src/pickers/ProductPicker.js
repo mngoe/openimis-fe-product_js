@@ -7,6 +7,18 @@ import { Autocomplete, useModulesManager, useTranslations } from "@openimis/fe-c
 import { DATE_FORMAT, EMPTY_STRING, PRODUCT_QUANTITY_LIMIT } from "../constants";
 import { useProductsQuery } from "../hooks";
 
+/**
+ * The `location` filter of the products query: the backend answers with the products of
+ * that location, of its ancestors and the national ones (no location), so the caller
+ * passes the most specific location it has (a family's village) and the picker does not
+ * narrow the result any further. An id that is not one (a missing parent decoded, say)
+ * is dropped rather than sent, as it would fail the whole query.
+ */
+const locationFilter = (locationId) => {
+  const id = parseInt(locationId, 10);
+  return Number.isNaN(id) ? undefined : id;
+};
+
 const ProductPicker = (props) => {
   const {
     multiple,
@@ -28,7 +40,7 @@ const ProductPicker = (props) => {
   } = props;
   const modulesManager = useModulesManager();
   const [filters, setFilters] = useState({
-    location: locationId,
+    location: locationFilter(locationId),
   });
   const [currentString, setCurrentString] = useState(EMPTY_STRING);
   const { formatMessage, formatMessageWithValues } = useTranslations("product", modulesManager);
@@ -57,7 +69,7 @@ const ProductPicker = (props) => {
         setFilters(() => ({
           first: PRODUCT_QUANTITY_LIMIT,
           search,
-          location: locationId,
+          location: locationFilter(locationId),
           dateFrom: moment(enrollmentDate).format(DATE_FORMAT),
           dateTo: moment(enrollmentDate).format(DATE_FORMAT),
         }))
