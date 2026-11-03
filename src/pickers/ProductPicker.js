@@ -39,6 +39,18 @@ const ProductPicker = (props) => {
   } = useProductsQuery({ filters }, { skip: true });
   const shouldShowTooltip = products.length >= PRODUCT_QUANTITY_LIMIT && !value && !currentString;
 
+  const getDateFilters = () => {
+    const m = moment(enrollmentDate, moment.ISO_8601, true);
+    if (!m.isValid()) {
+      return {};
+    }
+    const formattedDate = m.format(DATE_FORMAT);
+    return {
+      dateFrom: formattedDate,
+      dateTo: formattedDate,
+    };
+  };
+
   return (
     <Autocomplete
       multiple={multiple}
@@ -58,8 +70,7 @@ const ProductPicker = (props) => {
           first: PRODUCT_QUANTITY_LIMIT,
           search,
           location: locationId,
-          dateFrom: moment(enrollmentDate).format(DATE_FORMAT),
-          dateTo: moment(enrollmentDate).format(DATE_FORMAT),
+          ...getDateFilters(),
         }))
       }
       renderInput={(inputProps) => (
